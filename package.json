@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "nodemon --exec babel-node bin/www",
+    "lint": "xo --esnext src/**/*.js",
+    "test": "nyc mocha ./test/**/*.spec.js --compilers js:babel-core/register",
+    "cover": "npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "nyc": {
     "include": [
