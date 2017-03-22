@@ -13,7 +13,6 @@ export default class ShortUrlRepository {
     });
   }
 
-
   /**
    * @name persist
    * @param User
