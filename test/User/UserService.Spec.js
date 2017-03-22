@@ -20,20 +20,20 @@ describe('User Service', () => {
     const User = Service.createUser('Matheus', date);
 
     expect(User.name).to.equal('Matheus');
-    expect(User.birth_date).to.equal(date);
+    expect(User.birthDate).to.equal(date);
 
     expect(User).to.have.property('name');
-    expect(User).to.have.property('birth_date');
+    expect(User).to.have.property('birthDate');
     expect(User).to.have.property('_id');
   });
 
   it('Should delete an User', () => {
-    let date = new Date();
+    const date = new Date();
 
     const Matheus = new UserSchema({
       name: 'Matheus',
-      birth_date: date
-    })
+      birthDate: date
+    });
 
     sinon.stub(UserSchema, 'remove').returns(Matheus);
 

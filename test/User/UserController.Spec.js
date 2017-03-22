@@ -1,4 +1,4 @@
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import 'sinon-mongoose';
@@ -23,23 +23,19 @@ describe('UserController test', () => {
     Controller = new UserController(Repository, Service);
   });
 
-  it('Should create a new user', (done) => {
-    let request = httpMocks.createRequest({
+  it('Should create a new user', done => {
+    const request = httpMocks.createRequest({
       method: 'POST',
-      url: '/users',
-      params: {
-        name: 'Matheus'
-      }
+      url: '/users'
     });
 
-    let response = httpMocks.createResponse({
+    const response = httpMocks.createResponse({
       eventEmitter: events.EventEmitter
     });
 
     const RepositoryStub = sinon.stub(Repository, 'persist');
 
     RepositoryStub.resolves({});
-
 
     request.post = sinon.stub().returns({});
 
@@ -55,50 +51,49 @@ describe('UserController test', () => {
     });
   });
 
-  it('Should delete a user', (done) => {
+  it('Should delete a user', done => {
     const Matheus = new UserSchema({
       name: 'Matheus'
     });
 
-    let request = httpMocks.createRequest({
+    const request = httpMocks.createRequest({
       method: 'DELETE',
-      url: `'/users/'${Matheus._id}`,
-      params: {
-        name: 'Matheus'
-      }
+      url: `'/users/'${Matheus._id}`
     });
 
     const ServiceStub = sinon.stub(Service, 'deleteUser');
 
-    ServiceStub.resolves(Matheus)
+    ServiceStub.resolves(Matheus);
 
-    let response = httpMocks.createResponse({
+    const response = httpMocks.createResponse({
       eventEmitter: events.EventEmitter
     });
 
     Controller.deleteUser(request, response);
 
     response.on('end', () => {
+      ServiceStub.restore();
+
       expect(response.statusCode).to.equal(204);
 
       done();
     });
   });
 
-  it('Should update user', (done) => {
-    let Matheus = new UserSchema({
+  it('Should update user', done => {
+    const Matheus = new UserSchema({
       name: 'Matheus'
     });
 
-    let request = httpMocks.createRequest({
-      method: 'UPDATE',
+    const request = httpMocks.createRequest({
+      method: 'PUT',
       url: `'/users/'${Matheus._id}`,
-      params: {
+      body: {
         name: 'Lucas'
       }
     });
 
-    let response = httpMocks.createResponse({
+    const response = httpMocks.createResponse({
       eventEmitter: events.EventEmitter
     });
 
@@ -111,7 +106,9 @@ describe('UserController test', () => {
     Controller.updateUser(request, response);
 
     response.on('end', () => {
-      let result = JSON.parse(response._getData());
+      ServiceStub.restore();
+
+      const result = JSON.parse(response._getData());
 
       expect(response.statusCode).to.equal(200);
       expect(result.name).to.equal('Lucas');

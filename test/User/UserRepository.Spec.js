@@ -1,4 +1,4 @@
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import sinon from 'sinon';
 import 'sinon-mongoose';
 import UserSchema from '../../src/Schemas/UserSchema';
@@ -17,9 +17,9 @@ describe('Short URL Repository', () => {
   it('Should save a new User', () => {
     const date = new Date();
 
-    let User = new UserSchema({
+    const User = new UserSchema({
       name: 'Matheus',
-      birth_date: date
+      birthDate: date
     });
 
     sinon.stub(User, 'save');
@@ -30,7 +30,7 @@ describe('Short URL Repository', () => {
   });
 
   it('Should get User', () => {
-    let User = new UserSchema({
+    const User = new UserSchema({
       name: 'Matheus'
     });
 
