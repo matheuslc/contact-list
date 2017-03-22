@@ -2,7 +2,6 @@ import chai, { expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import 'sinon-mongoose';
-import 'sinon-as-promised';
 import events from 'events';
 import httpMocks from 'node-mocks-http';
 import UserSchema from '../../src/Schemas/UserSchema';
@@ -24,7 +23,7 @@ describe('UserController test', () => {
     Controller = new UserController(Repository, Service);
   });
 
-  it('Should create a new user', () => {
+  it('Should create a new user', (done) => {
     let request = httpMocks.createRequest({
       method: 'POST',
       url: '/users',
@@ -37,12 +36,26 @@ describe('UserController test', () => {
       eventEmitter: events.EventEmitter
     });
 
+    const RepositoryStub = sinon.stub(Repository, 'persist');
+
+    RepositoryStub.resolves({});
+
+
+    request.post = sinon.stub().returns({});
+
+    request.body = {
+      name: 'Matheus'
+    };
+
+    Controller.createUser(request, response);
+
     response.on('end', () => {
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
+      done();
     });
   });
 
-  it('Should delete a user', () => {
+  it('Should delete a user', (done) => {
     const Matheus = new UserSchema({
       name: 'Matheus'
     });
@@ -51,22 +64,29 @@ describe('UserController test', () => {
       method: 'DELETE',
       url: `'/users/'${Matheus._id}`,
       params: {
-        name: 'Matheus',
-        birth_date: new Date.now()
+        name: 'Matheus'
       }
     });
+
+    const ServiceStub = sinon.stub(Service, 'deleteUser');
+
+    ServiceStub.resolves(Matheus)
 
     let response = httpMocks.createResponse({
       eventEmitter: events.EventEmitter
     });
 
+    Controller.deleteUser(request, response);
+
     response.on('end', () => {
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(204);
+
+      done();
     });
   });
 
-  it('Should update user', () => {
-    const Matheus = new UserSchema({
+  it('Should update user', (done) => {
+    let Matheus = new UserSchema({
       name: 'Matheus'
     });
 
@@ -82,11 +102,21 @@ describe('UserController test', () => {
       eventEmitter: events.EventEmitter
     });
 
-    response.on('end', () => {
-      let result = response._getData();
+    const ServiceStub = sinon.stub(Service, 'updateUser');
 
-      expect(response.statusCode).to.be(200);
-      expect(result.name).to.be('Lucas');
+    Matheus.name = 'Lucas';
+
+    ServiceStub.resolves(Matheus);
+
+    Controller.updateUser(request, response);
+
+    response.on('end', () => {
+      let result = JSON.parse(response._getData());
+
+      expect(response.statusCode).to.equal(200);
+      expect(result.name).to.equal('Lucas');
+
+      done();
     });
   });
 });
