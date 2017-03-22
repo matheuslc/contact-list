@@ -24,4 +24,10 @@ export default class UserService {
       _id: userId
     });
   }
+
+  updateUser(userId, newUser) {
+    return UserSchema.findOneAndUpate({
+      _id: userId
+    }, newUser);
+  }
 }
