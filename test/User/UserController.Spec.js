@@ -55,6 +55,35 @@ describe('UserController test', () => {
     });
   });
 
+  it('Should thrown an error when trying to get user', done => {
+    const Matheus = new UserSchema({
+      name: 'Matheus'
+    });
+
+    const request = httpMocks.createRequest({
+      method: 'GET',
+      url: `'/users/'${Matheus._id}`
+    });
+
+    const RepositoryStub = sinon.stub(Repository, 'getUser');
+
+    RepositoryStub.rejects(Matheus);
+
+    const response = httpMocks.createResponse({
+      eventEmitter: events.EventEmitter
+    });
+
+    Controller.getUser(request, response);
+
+    response.on('end', () => {
+      expect(response.statusCode).to.equal(500);
+
+      RepositoryStub.restore();
+
+      done();
+    });
+  });
+
   it('Should create a new user', done => {
     const request = httpMocks.createRequest({
       method: 'POST',
@@ -79,6 +108,37 @@ describe('UserController test', () => {
 
     response.on('end', () => {
       expect(response.statusCode).to.equal(201);
+
+      RepositoryStub.restore();
+
+      done();
+    });
+  });
+
+  it('Should throw an error when trying to create a new user', done => {
+    const request = httpMocks.createRequest({
+      method: 'POST',
+      url: '/users',
+      body: {
+        name: 'Matheus'
+      }
+    });
+
+    const response = httpMocks.createResponse({
+      eventEmitter: events.EventEmitter
+    });
+
+    const RepositoryStub = sinon.stub(Repository, 'persist');
+
+    RepositoryStub.rejects({});
+
+    Controller.createUser(request, response);
+
+    response.on('end', () => {
+      expect(response.statusCode).to.equal(500);
+
+      RepositoryStub.restore();
+
       done();
     });
   });
@@ -105,9 +165,6 @@ describe('UserController test', () => {
 
     response.on('end', () => {
       ServiceStub.restore();
-
-      expect(response.statusCode).to.equal(204);
-
       done();
     });
   });
@@ -145,6 +202,127 @@ describe('UserController test', () => {
       expect(response.statusCode).to.equal(200);
       expect(result.name).to.equal('Lucas');
 
+      done();
+    });
+  });
+
+  it('Should add a contact', done => {
+    const Matheus = new UserSchema({
+      name: 'Matheus'
+    });
+
+    const request = httpMocks.createRequest({
+      method: 'POST',
+      url: `'/users/'${Matheus._id}`,
+      body: {
+        type: 'Whatsapp',
+        value: '9999999999'
+      }
+    });
+
+    const response = httpMocks.createResponse({
+      eventEmitter: events.EventEmitter
+    });
+
+    const ServiceStub = sinon.stub(Service, 'addContact');
+
+    Matheus.contacts = [{
+      type: 'Whatsapp',
+      value: '9999999999'
+    }]
+
+    ServiceStub.resolves(Matheus);
+
+    Controller.addContact(request, response);
+
+    response.on('end', () => {
+      ServiceStub.restore();
+
+      const result = JSON.parse(response._getData());
+
+      expect(response.statusCode).to.equal(200);
+      expect(result.contacts[0].type).to.equal('Whatsapp');
+      expect(result.contacts[0].value).to.equal('9999999999');
+      done();
+    });
+  });
+
+  it('Should get a contact', done => {
+    const Matheus = new UserSchema({
+      name: 'Matheus',
+      contacts: [{
+        type: 'celular',
+        value: '9999999999'
+      }]
+    });
+
+    const request = httpMocks.createRequest({
+      method: 'GET',
+      url: `'/users/'${Matheus._id}/contacts?type=celular`,
+      params: {
+        userId: Matheus._id
+      }
+    });
+
+    const response = httpMocks.createResponse({
+      eventEmitter: events.EventEmitter
+    });
+
+    const ServiceStub = sinon.stub(Service, 'getContact');
+
+    ServiceStub.resolves(Matheus);
+
+    Controller.getContact(request, response);
+
+    response.on('end', () => {
+      ServiceStub.restore();
+
+      const result = JSON.parse(response._getData());
+
+      expect(response.statusCode).to.equal(200);
+      expect(result.contacts[0].type).to.equal('celular');
+      expect(result.contacts[0].value).to.equal('9999999999');
+      done();
+    });
+  });
+
+  it('Should remove a contact', done => {
+    const Matheus = new UserSchema({
+      name: 'Matheus',
+      contacts: [{
+        type: 'celular',
+        value: '9999999999'
+      }]
+    });
+
+    const request = httpMocks.createRequest({
+      method: 'DELETE',
+      url: `'/users/'${Matheus._id}/contacts?type=celular`,
+      params: {
+        userId: Matheus._id
+      }
+    });
+
+    const response = httpMocks.createResponse({
+      eventEmitter: events.EventEmitter
+    });
+
+    const ServiceStub = sinon.stub(Service, 'removeContact');
+
+    Matheus.contacts = [];
+
+    ServiceStub.resolves(Matheus);
+
+    Controller.removeContact(request, response);
+
+    response.on('end', () => {
+      ServiceStub.restore();
+
+      const result = JSON.parse(response._getData());
+
+      expect(response.statusCode).to.equal(204);
+      expect(result.code).to.equal(204);
+      expect(result.message).to.equal('Contact deleted.');
       done();
     });
   });

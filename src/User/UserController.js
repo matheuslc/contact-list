@@ -1,7 +1,7 @@
 /**
  * Class UserController
  */
-export default class UserController {
+class UserController {
   constructor(UserRepository, UserService) {
     this.UserRepository = UserRepository;
     this.UserService = UserService;
@@ -28,7 +28,7 @@ export default class UserController {
   createUser(req, res) {
     if (!req.body.name) {
       return res.status(400).json({
-        state: 400,
+        status: 400,
         message: 'Please, provide a user name'
       });
     }
@@ -112,3 +112,5 @@ export default class UserController {
       })).catch(err => res.status(500).json(err));
   }
 }
+
+export default UserController;
