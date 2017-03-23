@@ -7,11 +7,11 @@ const Router = new express.Router();
 const UserRepositoryInstance = new UserRepository();
 const UserServiceInstance = new UserService();
 
-// Router.get('/users/:userId', function(req, res, next) {
-//   const Controller = new UserController(UserRepositoryInstance, UserServiceInstance);
-//
-//   Controller.createUser(req, res);
-// });
+Router.get('/users/:userId', function(req, res, next) {
+  const Controller = new UserController(UserRepositoryInstance, UserServiceInstance);
+
+  Controller.getUser(req, res);
+});
 
 Router.post('/users', (req, res, next) => {
   const Controller = new UserController(UserRepositoryInstance, UserServiceInstance);

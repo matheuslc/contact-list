@@ -8,6 +8,18 @@ export default class UserController {
   }
 
   /**
+   * @name getUser
+   * @param req
+   * @param res
+   * @returns {$}
+   */
+  getUser(req, res) {
+    this.UserRepository.getUser(req.params.userId)
+      .then(user => res.status(200).json(user))
+      .catch(err => res.status(500).json(err));
+  };
+
+  /**
    * @name createUser
    * @param req {Object} express request
    * @param res {Object} express response
