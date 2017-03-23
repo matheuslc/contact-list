@@ -23,6 +23,38 @@ describe('UserController test', () => {
     Controller = new UserController(Repository, Service);
   });
 
+  it('Should get an user', done => {
+    const Matheus = new UserSchema({
+      name: 'Matheus'
+    });
+
+    const request = httpMocks.createRequest({
+      method: 'GET',
+      url: `'/users/'${Matheus._id}`
+    });
+
+    const RepositoryStub = sinon.stub(Repository, 'getUser');
+
+    RepositoryStub.resolves(Matheus);
+
+    const response = httpMocks.createResponse({
+      eventEmitter: events.EventEmitter
+    });
+
+    Controller.getUser(request, response);
+
+    response.on('end', () => {
+      const result = JSON.parse(response._getData());
+
+      expect(response.statusCode).to.equal(200);
+      expect(result.name).to.equal('Matheus');
+
+      RepositoryStub.restore();
+
+      done();
+    });
+  });
+
   it('Should create a new user', done => {
     const request = httpMocks.createRequest({
       method: 'POST',
