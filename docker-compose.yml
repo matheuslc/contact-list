@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+  contact-list:
+    build: .
+    ports:
+      - "localhost:3000:3000"
+    volumes:
+      - $PWD:/usr/src/contact-list
+    links:
+      - mongo
+  mongo:
+      image: mongo:latest
+      ports:
+          - "27017:27017"
+      volumes:
+          - $PWD/shared:/tmp/shared
