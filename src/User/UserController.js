@@ -94,7 +94,18 @@ class UserController {
    */
   getContact(req, res) {
     return this.UserService.getContact(req.params.userId, req.query.type)
-      .then(contact => res.status(200).json(contact))
+      .then(contact => {
+        console.log('contact', contact);
+
+        if (contact.length) {
+          return res.status(404).json({
+            status: 404,
+            message: 'Contact not found'
+          });
+        }
+
+        return res.status(200).json(contact);
+      })
       .catch(err => res.status(500).json(err));
   }
 
