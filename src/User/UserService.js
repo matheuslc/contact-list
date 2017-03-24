@@ -91,7 +91,7 @@ export default class UserService {
    * @returns {Query|T|*}
    */
   getContact(userId, type) {
-    return UserSchema.find({
+    return UserSchema.findOne({
       _id: userId
     }, {
       contacts: {

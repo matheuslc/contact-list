@@ -15,7 +15,16 @@ class UserController {
    */
   getUser(req, res) {
     this.UserRepository.getUser(req.params.userId)
-      .then(user => res.status(200).json(user))
+      .then(user => {
+        if (user) {
+          return res.status(200).json(user);
+        }
+
+        return res.status(404).json({
+          status: 404,
+          message: 'User not found.'
+        });
+      })
       .catch(err => res.status(500).json(err));
   };
 
@@ -81,9 +90,21 @@ class UserController {
    * @returns {*}
    */
   addContact(req, res) {
-    return this.UserService.addContact(req.params.userId, req.body.type, req.body.value)
-      .then(updateUser => res.status(200).json(updateUser))
-      .catch(err => res.status(500, err));
+    this.UserService.getContact(req.params.userId, req.body.type)
+      .then(response => {
+        if (response.contacts.length) {
+          return res.status(500).json({
+            status: 500,
+            message: 'Contact type already exists'
+          })
+        }
+
+      return this.UserService.addContact(req.params.userId, req.body.type, req.body.value)
+        .then(updateUser => {
+          return res.status(200).json(updateUser)
+        })
+        .catch(err => res.status(500, err));
+    });
   }
 
   /**
@@ -95,16 +116,14 @@ class UserController {
   getContact(req, res) {
     return this.UserService.getContact(req.params.userId, req.query.type)
       .then(contact => {
-        console.log('contact', contact);
-
-        if (contact.length) {
+        if (!contact.contacts.length) {
           return res.status(404).json({
             status: 404,
             message: 'Contact not found'
           });
         }
 
-        return res.status(200).json(contact);
+        return res.status(200).json(contact.contacts[0]);
       })
       .catch(err => res.status(500).json(err));
   }

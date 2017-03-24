@@ -8,8 +8,7 @@ const UserSchema = new mongoose.Schema({
   birthDate: Date,
   contacts: [{
     type: {
-      type: String,
-      unique: true
+      type: String
     },
     value: {
       type: String
