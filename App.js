@@ -5,12 +5,13 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const config = require('./src/config');
 const index = require('./src/routes/users');
 
 const app = express();
 
 // Connect to DB
-mongoose.connect('mongodb://localhost:27017/users');
+mongoose.connect(config.database);
 
 // Use ES6 promises
 mongoose.Promise = global.Promise;
