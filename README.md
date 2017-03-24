@@ -12,6 +12,9 @@ A Node.js User contacts list Rest API
 * Put your mongodb url at src/config/index.json
 * npm start
 
+## Runing tests
+* npm test
+
 ## Using
 
 ### Create a new contact
